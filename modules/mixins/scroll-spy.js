@@ -1,5 +1,5 @@
 var scrollSpy = {
-  
+
   spyCallbacks: [],
   spySetState: [],
 
@@ -26,6 +26,7 @@ var scrollSpy = {
   },
 
   addSpyHandler: function(handler){
+    console.log('add spy handler');
     this.spyCallbacks.push(handler);
   },
 
@@ -36,9 +37,11 @@ var scrollSpy = {
       this.spySetState[i]();
     }
   },
-  unmount: function () { 
-    this.spyCallbacks = [];
-    this.spySetState = [];
+  unmount: function (handlers) {
+    var stateHandler = handlers.stateHandler;
+    var spyHandler = handlers.spyHandler;
+    this.spyCallbacks.splice(this.spyCallbacks.indexOf(spyHandler), 1);
+    this.spySetState.splice(this.spySetState.indexOf(stateHandler), 1);
 
     document.removeEventListener('scroll', this.scrollHandler);
   }

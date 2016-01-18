@@ -7,7 +7,7 @@ var scrollSpy = require('./scroll-spy');
 var scroller = require('./scroller');
 
 var Helpers = {
-  
+
   Scroll: {
 
     propTypes: {
@@ -52,49 +52,55 @@ var Helpers = {
       scrollSpy.mount();
 
       if(this.props.spy) {
-        var to = this.props.to;
-        var element = null;
-        var elemTopBound = 0;
-        var elemBottomBound = 0;
+        this.__spyTo = this.props.to;
+        this.__spyElement = null;
+        this.__spyElemTopBound = 0;
+        this.__spyElemBottomBound = 0;
 
-        scrollSpy.addStateHandler((function() {
-          if(scroller.getActiveLink() != to) {
-              this.setState({ active : false });
-          }
-        }).bind(this));
+        scrollSpy.addStateHandler(this.__stateHandler);
 
-        scrollSpy.addSpyHandler((function(y) {
-
-          if(!element) {
-              element = scroller.get(to);
-
-              var cords = element.getBoundingClientRect();
-              elemTopBound = (cords.top + y);
-              elemBottomBound = elemTopBound + cords.height;
-          }
-
-          var offsetY = y - this.props.offset;
-          var isInside = (offsetY >= elemTopBound && offsetY <= elemBottomBound);
-          var isOutside = (offsetY < elemTopBound || offsetY > elemBottomBound);
-          var activeLnik = scroller.getActiveLink();
-
-          if (isOutside && activeLnik === to) {
-
-            scroller.setActiveLink(void 0);
-            this.setState({ active : false });
-
-          } else if (isInside && activeLnik != to) {
-
-            scroller.setActiveLink(to);
-            this.setState({ active : true });
-            if(this.props.onSetActive) this.props.onSetActive(to);
-            scrollSpy.updateStates();
-          }
-        }).bind(this));
+        scrollSpy.addSpyHandler(this.__spyHandler);
       }
     },
     componentWillUnmount: function() {
-      scrollSpy.unmount();
+      scrollSpy.unmount({stateHandler: this.__stateHandler, spyHandler: this.__spyHandler});
+    },
+    __stateHandler: function() {
+      if(scroller.getActiveLink() != this.__spyTo) {
+          this.setState({ active : false });
+      }
+    },
+    __spyHandler: function (y) {
+      var to = this.__spyTo;
+      var element = this.__spyElement;
+      var elemTopBound = this.__spyElemTopBound;
+      var elemBottomBound = this.__spyElemBottomBound;
+
+      if(!element) {
+          element = scroller.get(to);
+
+          var cords = element.getBoundingClientRect();
+          elemTopBound = (cords.top + y);
+          elemBottomBound = elemTopBound + cords.height;
+      }
+
+      var offsetY = y - this.props.offset;
+      var isInside = (offsetY >= elemTopBound && offsetY <= elemBottomBound);
+      var isOutside = (offsetY < elemTopBound || offsetY > elemBottomBound);
+      var activeLnik = scroller.getActiveLink();
+
+      if (isOutside && activeLnik === to) {
+
+        scroller.setActiveLink(void 0);
+        this.setState({ active : false });
+
+      } else if (isInside && activeLnik != to) {
+
+        scroller.setActiveLink(to);
+        this.setState({ active : true });
+        if(this.props.onSetActive) this.props.onSetActive(to);
+        scrollSpy.updateStates();
+      }
     }
   },
 
