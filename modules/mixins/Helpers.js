@@ -110,11 +110,19 @@ var Helpers = {
       name: React.PropTypes.string.isRequired
     },
     componentDidMount: function() {
-      var domNode = ReactDOM.findDOMNode(this);
-      scroller.register(this.props.name, domNode);
+      this.registerElems(this.props.name);
+    },
+    componentWillReceiveProps: function(nextProps) {
+      if (this.props.name !== nextProps.name) {
+        this.registerElems(nextProps.name);
+      }
     },
     componentWillUnmount: function() {
       scroller.unregister(this.props.name);
+    },
+    registerElems: function(name) {
+      var domNode = ReactDOM.findDOMNode(this);
+      scroller.register(name, domNode);
     }
   }
 };
