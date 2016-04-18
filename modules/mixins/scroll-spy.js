@@ -26,7 +26,6 @@ var scrollSpy = {
   },
 
   addSpyHandler: function(handler){
-    console.log('add spy handler');
     this.spyCallbacks.push(handler);
   },
 
